@@ -39,7 +39,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(
-                    height: 48,
+                    height: 32,
                   ),
                   Text(
                     'Update Profile',
@@ -49,39 +49,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   const SizedBox(
                     height: 24,
                   ),
-                  Container(
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 56,
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          decoration: const BoxDecoration(
-                            color: Colors.grey,
-                          ),
-                          alignment: Alignment.center,
-                          child: Text('Photo'),
-                        ),
-                        Text('No Item selected'),
-                      ],
-                    ),
-                  ),
-                  // TextFormField(
-                  //   controller: _photoTEController,
-                  //   keyboardType: TextInputType.emailAddress,
-                  //   decoration: InputDecoration(
-                  //     hintText: 'Photo',
-                  //     hintStyle: TextStyle(
-                  //       fontWeight: FontWeight.w400,
-                  //       color: Colors.grey,
-                  //     ),
-                  //     //labelText: 'Email',
-                  //   ),
-                  // ),
+                  _buildPhotoPicker(),
                   const SizedBox(
                     height: 10,
                   ),
@@ -177,6 +145,37 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         ),
       ),
     );
+  }
+
+  Container _buildPhotoPicker() {
+    return Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 56,
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        decoration: const BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            bottomLeft: Radius.circular(8),
+                          )
+                        ),
+                        alignment: Alignment.center,
+                        child: Text('Photo',style: TextStyle(
+                          color: Colors.white,
+                        ),),
+                      ),
+                      const SizedBox(width: 12,),
+                      Text('No Item selected',maxLines: 1,),
+                    ],
+                  ),
+                );
   }
 
   @override
