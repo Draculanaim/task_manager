@@ -1,8 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/services/network_caller.dart';
+import 'package:task_manager/data/utils/urls.dart';
 import 'package:task_manager/ui/screans/main_bottom_nav_screen.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
 import '../utils/app_colors.dart';
+import '../widgets/snack_bar_message.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -14,10 +17,10 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _passTEController = TextEditingController();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  bool _signInInprogress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +56,11 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       //labelText: 'Email',
                     ),
+                    validator: (String? value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Enter a valid email';
+                      }
+                    },
                   ),
                   const SizedBox(
                     height: 10,
@@ -68,15 +76,23 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       //labelText: 'Password',
                     ),
+                    validator: (String? value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Enter a valid password';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(
                     height: 24,
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, MainBottomNavScreen.name);
-                    },
-                    child: Icon(Icons.arrow_circle_right_outlined),
+                  Visibility(
+                    visible: _signInInprogress==false,
+                    replacement: const CircularProgressIndicator(),
+                    child: ElevatedButton(
+                      onPressed: _onTapSignInButton,
+                      child: Icon(Icons.arrow_circle_right_outlined),
+                    ),
                   ),
                   const SizedBox(
                     height: 40,
@@ -103,27 +119,63 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
+  void _onTapSignInButton() {
+    if (_formkey.currentState!.validate()) {
+      _signIn();
+    }
+  }
+
+  Future<void> _signIn() async {
+    setState(() {
+      _signInInprogress = true;
+    });
+
+    Map<String, dynamic> requestBody = {
+      "email": _emailTEController.text.trim(),
+      "password": _passTEController.text,
+    };
+
+    final NetworkResponse response =
+        await NetworkCaller.postRequest(url: Urls.loginurl, body: requestBody,);
+
+
+    if (response.isSuccess) {
+      _clearTextFields();
+      Navigator.pushReplacementNamed(context, MainBottomNavScreen.name);
+      ShowSnakBarMessage(context, 'Login Successful');
+    } else {
+      _signInInprogress=false;
+      setState(() {});
+      ShowSnakBarMessage(context, response.errorMessage);
+    }
+  }
+
+  void _clearTextFields() {
+    _emailTEController.clear();
+    _passTEController.clear();
+  }
+
   Widget _buildSignUpSection() {
     return RichText(
-                        text: TextSpan(
-                      text: "Don't have an account ?  ",
-                      style: TextStyle(
-                          color: Colors.black54, fontWeight: FontWeight.w600),
-                      children: [
-                        TextSpan(
-                          text: 'Sign Up',
-                          style: TextStyle(
-                            color: AppColors.themeColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                            Navigator.pushNamed(context, '/signup');
-                            },
-                        )
-                      ],
-                    ));
+        text: TextSpan(
+      text: "Don't have an account ?  ",
+      style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
+      children: [
+        TextSpan(
+          text: 'Sign Up',
+          style: TextStyle(
+            color: AppColors.themeColor,
+            fontWeight: FontWeight.bold,
+          ),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              Navigator.pushNamed(context, '/signup');
+            },
+        )
+      ],
+    ));
   }
+
   @override
   void dispose() {
     _emailTEController.dispose();

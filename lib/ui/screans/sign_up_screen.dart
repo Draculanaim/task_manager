@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:task_manager/data/services/network_caller.dart';
 import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/ui/screans/sign_in_screen.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
 
 import '../utils/app_colors.dart';
@@ -190,7 +191,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _signUpInprogress = true;  // Ensure UI updates before making the request
     });
 
-    Map<String, dynamic> requestParams = {
+    Map<String, dynamic> requestBody = {
       "email": _emailTEController.text.trim(),
       "firstName": _firstTEController.text.trim(),
       "lastName": _lastTEController.text.trim(),
@@ -202,7 +203,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       final NetworkResponse response = await NetworkCaller.postRequest(
           url: Urls.registrationurl,
-          body: requestParams
+          body: requestBody
       );
 
       setState(() {
@@ -211,6 +212,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       if (response.isSuccess) {
         _clearTextFields();
+        Navigator.pushNamed(context, SignInScreen.name);
         ShowSnakBarMessage(context, 'Registration Successful');
       } else {
         ShowSnakBarMessage(context, response.errorMessage);
