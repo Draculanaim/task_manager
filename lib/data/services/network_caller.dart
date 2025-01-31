@@ -22,10 +22,10 @@ class NetworkCaller {
       {required String url, Map<String, dynamic>? params}) async {
     try{
       Uri uri = Uri.parse(url);
-      debugPrint('URL => $url');
+      print('URL => $url');
       Response response = await get(uri);
-      debugPrint('Response Code => ${response.statusCode}');
-      debugPrint('Response data => ${response.body}');
+      print('Response Code => ${response.statusCode}');
+      print('Response data => ${response.body}');
       if (response.statusCode == 200) {
         final decodeResponse = jsonDecode(response.body);
         return NetworkResponse(
@@ -45,14 +45,14 @@ class NetworkCaller {
       {required String url, Map<String, dynamic>? body}) async {
     try{
       Uri uri = Uri.parse(url);
-      debugPrint('URL => $url');
+      print('URL => $url');
       Response response = await post(uri,
           headers: {
         'content-type':'application/json'
           },
           body:jsonEncode(body));
-      debugPrint('Response Code => ${response.statusCode}');
-      debugPrint('Response data => ${response.body}');
+      print('Response Code => ${response.statusCode}');
+      print('Response data => ${response.body}');
       if (response.statusCode == 200) {
         final decodeResponse = jsonDecode(response.body);
         return NetworkResponse(

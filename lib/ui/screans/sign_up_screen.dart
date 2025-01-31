@@ -150,13 +150,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     height: 24,
                   ),
                   Visibility(
-                    visible: _signUpInprogress==false,
-                    replacement:const CirculerProgressIndicator(),
+                    visible: !_signUpInprogress,
+                    replacement: const Center(
+                      child: SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
                     child: ElevatedButton(
                       onPressed: _onTapSignUpButton,
                       child: Icon(Icons.arrow_circle_right_outlined),
                     ),
                   ),
+
                   const SizedBox(
                     height: 40,
                   ),
@@ -179,8 +186,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _registration() async {
-    _signUpInprogress = true;
-    setState(() {});
+    setState(() {
+      _signUpInprogress = true;  // Ensure UI updates before making the request
+    });
 
     Map<String, dynamic> requestParams = {
       "email": _emailTEController.text.trim(),
@@ -191,26 +199,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
       "photo": "",
     };
 
-    final NetworkResponse response = await NetworkCaller.postRequest(
-        url: Urls.registrationurl, body: requestParams);
-    _signUpInprogress=false;
-    setState(() {});
-    if (response.isSuccess) {
-      _clearTextFields();
-      ShowSnakBarMessage(context, 'Registration Successfull');
+    try {
+      final NetworkResponse response = await NetworkCaller.postRequest(
+          url: Urls.registrationurl,
+          body: requestParams
+      );
 
-    } else {
-      ShowSnakBarMessage(context, response.errorMessage);
+      setState(() {
+        _signUpInprogress = false; // Ensure UI updates after response
+      });
+
+      if (response.isSuccess) {
+        _clearTextFields();
+        ShowSnakBarMessage(context, 'Registration Successful');
+      } else {
+        ShowSnakBarMessage(context, response.errorMessage);
+      }
+    } catch (e) {
+      setState(() {
+        _signUpInprogress = false;
+      });
+      ShowSnakBarMessage(context, "An error occurred: ${e.toString()}");
     }
   }
 
-  void _clearTextFields(){
+
+  void _clearTextFields() {
     _emailTEController.clear();
     _firstTEController.clear();
     _lastTEController.clear();
     _mobileTEController.clear();
     _passTEController.clear();
-
   }
 
   Widget _buildSignInSection() {
